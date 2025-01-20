@@ -1,0 +1,173 @@
+<html lang="en">
+ <head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>
+   thedoppler.cc
+  </title>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css" rel="stylesheet"/>
+  <style>
+   body {
+            margin: 0;
+            padding: 0;
+            font-family: 'Courier New', Courier, monospace;
+            background-color: #1a1a1a;
+            color: #ccc;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            text-align: center;
+            overflow: hidden;
+        }
+        .title {
+            font-size: 48px;
+            margin-bottom: 20px;
+            z-index: 1;
+        }
+        .title .orange {
+            color: orange;
+        }
+        .time {
+            font-size: 18px;
+            margin-bottom: 20px;
+            z-index: 1;
+        }
+        .background {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        .footer {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            font-size: 14px;
+            z-index: 1;
+        }
+        .social-buttons {
+            z-index: 1;
+            margin-bottom: 20px;
+        }
+        .social-buttons a {
+            color: #ccc;
+            margin: 0 10px;
+            font-size: 24px;
+            text-decoration: none;
+        }
+        .audio-control {
+            position: absolute;
+            bottom: 10px;
+            left: 10px;
+            z-index: 1;
+        }
+  </style>
+  <script>
+    function updateTime() {
+        const now = new Date();
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+        document.getElementById('current-time').textContent = `== Current Time for Me: ${hours}:${minutes}:${seconds} ==`;
+    }
+    setInterval(updateTime, 1000);
+
+    window.onload = function() {
+        const canvas = document.getElementById('network-canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+
+        const nodes = [];
+        const maxNodes = 100;
+        const maxDistance = 100;
+
+        function Node(x, y) {
+            this.x = x;
+            this.y = y;
+            this.vx = Math.random() * 2 - 1;
+            this.vy = Math.random() * 2 - 1;
+        }
+
+        Node.prototype.update = function() {
+            this.x += this.vx;
+            this.y += this.vy;
+
+            if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+            if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+        };
+
+        function draw() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#1a1a1a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < nodes.length; i++) {
+                const node = nodes[i];
+                node.update();
+                ctx.beginPath();
+                ctx.arc(node.x, node.y, 2, 0, Math.PI * 2);
+                ctx.fillStyle = '#ccc';
+                ctx.fill();
+
+                for (let j = i + 1; j < nodes.length; j++) {
+                    const otherNode = nodes[j];
+                    const dx = node.x - otherNode.x;
+                    const dy = node.y - otherNode.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+
+                    if (distance < maxDistance) {
+                        ctx.beginPath();
+                        ctx.moveTo(node.x, node.y);
+                        ctx.lineTo(otherNode.x, otherNode.y);
+                        ctx.strokeStyle = `rgba(204, 204, 204, ${1 - distance / maxDistance})`;
+                        ctx.stroke();
+                    }
+                }
+            }
+
+            requestAnimationFrame(draw);
+        }
+
+        for (let i = 0; i < maxNodes; i++) {
+            nodes.push(new Node(Math.random() * canvas.width, Math.random() * canvas.height));
+        }
+
+        draw();
+    };
+  </script>
+ </head>
+ <body>
+  <div class="title">
+   thedoppler.<span class="orange">cc</span>
+  </div>
+  <div class="time" id="current-time">
+   == Current Time for Me: 18:47:15 ==
+  </div>
+  <div class="social-buttons">
+   <a href="https://youtube.com/@thedoppler-l5z?si=qPgcsOir2PoUiaOw" target="_blank">
+    <i class="fab fa-youtube"></i>
+   </a>
+   <a href="https://github.com/ceezqt" target="_blank">
+    <i class="fab fa-github"></i>
+   </a>
+   <a href="https://cash.app/$BigBallerBrazil" target="_blank">
+    <i class="fas fa-dollar-sign"></i>
+   </a>
+   <a href="https://paypal.me/thedoppler" target="_blank">
+    <i class="fab fa-paypal"></i>
+   </a>
+  </div>
+  <canvas class="background" id="network-canvas"></canvas>
+  <div class="footer">
+   Made by Ceez
+  </div>
+  <div class="audio-control">
+   <iframe width="0" height="0" src="https://www.youtube.com/embed/uqy3NHwuFVk?autoplay=1&loop=1&playlist=uqy3NHwuFVk" frameborder="0" allow="autoplay; encrypted-media" allowfullscreen></iframe>
+  </div>
+ </body>
+</html>
